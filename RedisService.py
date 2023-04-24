@@ -123,6 +123,38 @@ class RedisHelper:
 
         return f'{new_sec}.{new_mill} seconds'
 
+    def serialize_set(self):
+        return
+
+    def pipeline(self, times=1000000, toggle=True):
+
+        start = self.r.time()
+        if toggle:
+            pipeline = self.r.pipeline()
+            for item in range(times):
+                pipeline.ping()
+            pipeline.execute()
+        else:
+            for item in range(times):
+                self.r.ping()
+        end = self.r.time()
+
+        print('===== ===== ===== ===== =====')
+        print(f'Ran Ping Command {times} times {"not " if not toggle else ""}using pipelines')
+        print(self.perf_test(start, end))
+
+        return
+
+    # ===== Output =====
+    # redis_helper.pipeline()
+    # ===== ===== ===== ===== =====
+    # Ran Ping Command 1000000 times using pipelines
+    # 5.451892 seconds
+    # redis_helper.pipeline(toggle=False)
+    # ===== ===== ===== ===== =====
+    # Ran Ping Command 1000000 times not using pipelines
+    # 29.439950 seconds
+
     # def update_replica(self):
     #     for r in self.replicas:
     # repeat same method
@@ -142,5 +174,8 @@ class RedisHelper:
 redis_helper = RedisHelper()
 redis_helper.set('first_key', 'first_value')
 redis_helper.get('first_key')
+
+redis_helper.set('first_num', 123456)
+redis_helper.get('first_num')
 
 # redis_helper.create_replica()
